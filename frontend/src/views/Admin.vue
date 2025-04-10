@@ -64,12 +64,16 @@
           </tr>
         </tbody>
       </table>
+      <div>
+        <button @click="logout" class="logout">Logout</button>
+      </div>
     </div>
   </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import router from '../router';
 
 const showModal = ref(false)
 const showAssignment = ref(false)
@@ -77,7 +81,7 @@ var rownum = ref(1)
 const AddStudentData = ref([]);
 const student = ref([]);
 const teacher = ref([]);
-const errorMessage = ref('');
+
 
 const addRow = () => {
     rownum.value += 1;
@@ -98,14 +102,14 @@ const submit = async () =>{
         });
         if (response.data.status === true) {
             alert('Insert successful!');
-            showModal.value = false
+            showModal.value = false;
+            await getStudent();
+            await getTeacher();
         } else {
-          this.errorMessage = response.data.message ;
+
         }
       } catch (error) {
-        // Handle errors, such as network errors
         console.error(error);
-        this.errorMessage = "Something went wrong. Please try again.";
       }
     }
 }
@@ -125,7 +129,9 @@ const submitAssign = async () => {
         });
         if (response.data.status === true) {
             alert('Update successful!');
-            showAssignment.value = false
+            showAssignment.value = false;
+            await getStudent();
+            await getTeacher();
         } else {
             alert('Update Failed!');
         }
@@ -134,28 +140,49 @@ const submitAssign = async () => {
     }
 }
 
-onMounted(async () => {
+const logout = () => {
+    localStorage.removeItem('user_id');
+    router.push('/login')
+}
+
+
+const getStudent = async () => {
     try {
-        const responseStudent = await axios.get('/api/getStudent').then((result) => {
+        const response = await axios.get('/api/getStudent').then((result) => {
             return result;
         }).catch((err) => {
             console.log(err);
         });
         
-        const responseTeacher = await axios.get('/api/getTeacher').then((result) => {
-            return result;
-        }).catch((err) => {
-            console.log(err);
-        });
-        if(responseStudent.data.status === true && responseTeacher.data.status === true){
-            student.value = responseStudent.data.student;
-            teacher.value = responseTeacher.data.teacher;
+        if(response.data.status === true ){
+            student.value = response.data.student;
         }
-
-        console.log(responseTeacher.data)
     } catch (err){
         console.log(err)
     }
+}
+
+const getTeacher = async() =>{
+    try{
+        const response = await axios.get('/api/getTeacher').then((result) => {
+                return result;
+            }).catch((err) => {
+                console.log(err);
+            });
+            if(response.data.status === true){
+                teacher.value = response.data.teacher;
+            }
+    } catch(err){
+        console.log(err)
+    }
+}
+
+onMounted(async () => {
+    const promise = [
+        getStudent(),
+        getTeacher(),
+    ];
+    Promise.all(promise)
 });
 
 
@@ -204,6 +231,11 @@ th, td {
 .assign {
     color: #414d5a;
 }
+
+.logout {
+    margin-top: 80px;
+}
+
 
 
 /* Button Styling */

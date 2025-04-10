@@ -15,6 +15,8 @@ router.post("/addStudent", adminController.addStudent)
 router.put('/assignTeacher', adminController.assignTeacher)
 
 router.get('/getTeacher', teacherController.getTeacher)
+router.get('/getStudentByTeacher/:user_id',teacherController.getOwnStudent)
+router.put('/gradeAssign', teacherController.gradeAssign)
 
 
 export default router;

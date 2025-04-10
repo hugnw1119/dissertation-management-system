@@ -72,7 +72,12 @@ export default {
           const user = response.data.user
           localStorage.setItem('user_id', JSON.stringify(user.user_id));
           alert(' Login successful!');
-          router.push("/admin"); 
+          if (user.position === 'admin') {
+            router.push("/admin"); 
+          } else {
+            router.push("/teacher"); 
+          }
+      
         } else {
           this.errorMessage = response.data.message || "Login failed!";
         }
