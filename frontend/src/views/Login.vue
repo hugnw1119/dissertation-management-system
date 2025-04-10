@@ -35,11 +35,12 @@
   </div>
 </template>
   
-<script >
+<script>
 import axios from 'axios';
-import router from '../router/router';
+import router from '../router';
 
 export default {
+  name:'Login',
   data() {
     return {
       email: "",
@@ -67,10 +68,10 @@ export default {
         }).catch((err) => {
             console.log(err);
         });
-        console.log(response)
         if (response.data.status === true) {
           const user = response.data.user
           localStorage.setItem('user_id', JSON.stringify(user.user_id));
+          alert(' Login successful!');
           router.push("/admin"); 
         } else {
           this.errorMessage = response.data.message || "Login failed!";
